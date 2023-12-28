@@ -57,6 +57,14 @@ canvas.height = canvas_height;
     rect_y_vel = 0;
     rect_x = Math.floor(Math.random() * canvas_width-25);
   }
+
+  ctx.font = "14px Arial";
+  ctx.fillText("cursor_activated", 10, 50)
+  ctx.fillText(cursor_activated, 175, 50)
+  ctx.fillText("cursor_x", 10, 65)
+  ctx.fillText(cursor_x, 175, 65)
+  ctx.fillText("cursor_y", 10, 80)
+  ctx.fillText(cursor_y, 175, 80)
 }
 
 function launch_loop() {
@@ -70,3 +78,36 @@ function launch_loop() {
 }
 
 window.onload = setInterval(launch_loop, main_loop_sleep)
+
+var cursor_activated = false;
+var cursor_x = 0;
+var cursor_y = 0;
+
+canvas.addEventListener("mousedown", function (e) {
+  cursor_activated = true;
+  update_mouse_pos(e);
+}, false);
+canvas.addEventListener("touchstart", function (e) {
+  cursor_activated = true;
+  update_mouse_pos(e.touches[0]);
+}, false);
+
+canvas.addEventListener("mouseup", function (e) {
+  cursor_activated = false;
+}, false);
+canvas.addEventListener("touchend", function (e) {
+  cursor_activated = false;
+}, false);
+
+canvas.addEventListener("mousemove", function (e) {
+  update_mouse_pos(e)
+}, false);
+canvas.addEventListener("touchmove", function (e) {
+  update_mouse_pos(e.touches[0])
+}, false);
+
+function update_mouse_pos(e) {
+  var rect = canvas.getBoundingClientRect()
+  cursor_x = e.clientX - rect.left,
+  cursor_y = e.clientY - rect.top
+} 
