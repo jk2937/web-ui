@@ -117,25 +117,15 @@ var cursor_old_x = 0;
 var cursor_old_y = 0;
 var cursor_events = [];
 
-canvas.addEventListener("mousedown", function (e) {
-  cursor_activated = true;
-  update_mouse_pos(e);
-}, false);
 canvas.addEventListener("touchstart", function (e) {
   cursor_activated = true;
   update_mouse_pos(e.touches[0]);
 }, false);
 
-canvas.addEventListener("mouseup", function (e) {
-  cursor_activated = false;
-}, false);
 canvas.addEventListener("touchend", function (e) {
   cursor_activated = false;
 }, false);
 
-canvas.addEventListener("mousemove", function (e) {
-  update_mouse_pos(e)
-}, false);
 canvas.addEventListener("touchmove", function (e) {
   update_mouse_pos(e.touches[0])
 }, false);
