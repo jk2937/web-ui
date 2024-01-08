@@ -1,7 +1,8 @@
 Todo:
 
-v0.0.2 - Change color
-v0.0.3 - Remove debug information
-v0.0.4 - Implement event polling
-
+Change color
+Remove debug information
+Implement event polling
+fix ios scrolling
+fullscreen
 
