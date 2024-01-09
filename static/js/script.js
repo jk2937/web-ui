@@ -3,21 +3,18 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
-ctx.fillStyle = "#FF0000";
-ctx.fillRect(0, 0, 150, 75);
-
 canvas_width = 500;
 canvas_height = 500;
 
 canvas_fullscreen = false;
-canvas_fullscreen_dynamic_res = false;
+canvas_fullscreen_dynamic_res = true;
 
 canvas.width = canvas_width;
 canvas.height = canvas_height;
 
-if (canvas_fullscreen) {
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
+if (canvas_fullscreen_dynamic_res) {
+    // canvas.style.width = '100%';
+    // canvas.style.height = '100%';
     canvas.style.position = "absolute";
     canvas.style.left = "0px";
     canvas.style.top = "0px";
@@ -35,6 +32,7 @@ let cursor_old_y = 0;
 let touch_events_buffer = [];
 
 canvas.addEventListener("touchstart", function(e) {
+	e.preventDefault()
     console.log(e)
     touch_events_buffer.push(e)
     // cursor_activated = true;
@@ -42,16 +40,23 @@ canvas.addEventListener("touchstart", function(e) {
 }, false);
 
 canvas.addEventListener("touchend", function(e) {
+	e.preventDefault()
     console.log(e)
     touch_events_buffer.push(e)
     // cursor_activated = false;
 }, false);
 
 canvas.addEventListener("touchmove", function(e) {
+	e.preventDefault()
     console.log(e)
     touch_events_buffer.push(e)
     // update_mouse_pos(e.touches[0])
 }, false);
+
+window.addEventListener("touchstart", ev => {
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+}, { passive: false });
 
 /* function update_mouse_pos(e) {
     let rect = canvas.getBoundingClientRect();
@@ -63,18 +68,22 @@ canvas.addEventListener("touchmove", function(e) {
 
 // Main variables
 
-display_debug_info = false
+display_debug_info = true 
 
 main_exec_lock = false;
-main_loop_sleep = 15;
+main_loop_sleep = 0;
+total_lag_frames = 0;
+fps_frame_counter = 0;
+fps = 0;
 
-rect_x = 0;
+stress_test = false;
+stress_loops = 9999999;
+
+/* rect_x = 0;
 rect_y = 0;
 
 rect_x_vel = 0;
-rect_y_vel = 0;
-
-cursor_activated_timer = 0;
+rect_y_vel = 0; */
 
 touch_events_history = []
 
@@ -83,14 +92,14 @@ touch_events_history = []
 
 function main_exec_loop() {
     if (canvas_fullscreen_dynamic_res) {
-        canvas_width = window.screen.availWidth;
+        // canvas_width = window.screen.availWidth;
+        // canvas_height = window.screen.availHeight;
 
-        canvas_height = window.screen.availHeight;
+		canvas_width = window.innerWidth;
+		canvas_height = window.innerHeight;
 
         canvas.width = canvas_width;
-
         canvas.height = canvas_height;
-
     }
 
     ctx.fillStyle = "LightGray";
@@ -104,7 +113,7 @@ function main_exec_loop() {
 
 	ctx.font = "16px Arial";
     ctx.fillStyle = "Gray";
-    ctx.fillText("Welcome to web-ui!", 10, 50)
+    ctx.fillText("Welcome to web-ui!", canvas_width / 2 - 75, 20)
 
 	for(let i = 0; i < touch_events_history.length; i++) {
 		let event_ = touch_events_history[i]
@@ -117,6 +126,8 @@ function main_exec_loop() {
 		}
 	}
 
+
+	/*
 
     rect_x += rect_x_vel;
     rect_y += rect_y_vel;
@@ -139,10 +150,26 @@ function main_exec_loop() {
     ctx.fillStyle = "Gray";
     ctx.fillRect(rect_x, rect_y, 25, 25);
 
+	*/
+
 
     if (display_debug_info == true) {
         ctx.font = "14px Arial";
-        ctx.fillText("cursor_activated", 10, 50)
+		ctx.fillStyle = "Gray"
+		ctx.fillText("canvas_width", 10, 50)
+		ctx.fillText(canvas_width, 175, 50)
+		ctx.fillText("canvas_height", 10, 65)
+		ctx.fillText(canvas_height, 175, 65)
+
+		ctx.fillText("main_loop_sleep", 10, 95)
+		ctx.fillText(main_loop_sleep, 175, 95)
+		ctx.fillText("total_lag_frames", 10, 110)
+		ctx.fillText(total_lag_frames, 175, 110)
+
+		ctx.fillText("fps", 10, 140)
+		ctx.fillText(fps, 175, 140)
+
+        /* ctx.fillText("cursor_activated", 10, 50)
         ctx.fillText(cursor_activated, 175, 50)
         ctx.fillText("cursor_x", 10, 65)
         ctx.fillText(cursor_x, 175, 65)
@@ -151,10 +178,20 @@ function main_exec_loop() {
         ctx.fillText("cursor_old_x", 10, 95)
         ctx.fillText(cursor_old_x, 175, 95)
         ctx.fillText("cursor_old_y", 10, 110)
-        ctx.fillText(cursor_old_y, 175, 110)
+        ctx.fillText(cursor_old_y, 175, 110) */
     }
 
+	if(stress_test == true) {
+
+		for(i = 0; i < stress_loops; i++) {
+			ctx.fillText("", 0, 0)
+		}
+
+	}
+
     touch_events_buffer = []
+
+	fps_frame_counter ++;
 }
 
 
@@ -162,8 +199,10 @@ function main_exec_loop() {
 
 function launch_loop() {
     if (main_exec_lock == true) {
-        console.log("Main execution loop locked!")
+		console.log("foobar")
         main_loop_sleep++;
+		total_lag_frames++;
+		main_loop_setInt = setInterval("launch_loop()", main_loop_sleep)
         return false;
     }
     main_exec_lock = true;
@@ -172,4 +211,13 @@ function launch_loop() {
     return true;
 }
 
-window.onload = setInterval(launch_loop, main_loop_sleep)
+function calculate_fps() {
+	fps = fps_frame_counter
+	fps_frame_counter = 0
+}
+
+window.onload = function() { 
+	main_loop_setInt = setInterval("launch_loop()", main_loop_sleep)
+	setInterval(calculate_fps, 1000)
+}
+

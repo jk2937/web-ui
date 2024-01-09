@@ -6,3 +6,4 @@ Issue 3 - Implement event polling
 Issue 4 - fix ios scrolling
 Issue 5 - fullscreen
 Issue 6 - filter touch event data outside of canvas
+Issue 7 - main_exec_lock does not work

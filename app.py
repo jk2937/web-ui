@@ -24,7 +24,7 @@ if __name__ == "__main__":
     #server_thread.daemon = True
     #server_thread.start()
 
-    url = f"http://localhost:{port}"
-    subprocess.call(["cmd.exe", "/c", "start", url])
+    # url = f"http://localhost:{port}"
+    # subprocess.call(["cmd.exe", "/c", "start", url])
 
     app.run(port=port, host="0.0.0.0")
